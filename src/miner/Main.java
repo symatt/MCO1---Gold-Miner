@@ -42,10 +42,18 @@ public class Main extends Application {
         ArrayList<Integer> gLoc = new ArrayList<>();
         ArrayList<Integer> pLoc = new ArrayList<>();
 
-        for (String str : InputsController.beaconLoc.split("\\s")) bLoc.add(Integer.valueOf(str));
-        for (String str : InputsController.goldLoc.split("\\s")) gLoc.add(Integer.valueOf(str));
-        for (String str : InputsController.pitLoc.split("\\s")) pLoc.add(Integer.valueOf(str));
+        for (String str : InputsController.beaconLoc.split("\\s"))
+            bLoc.add(Integer.valueOf(str));
+        for (String str : InputsController.goldLoc.split("\\s"))
+            gLoc.add(Integer.valueOf(str));
+        for (String str : InputsController.pitLoc.split("\\s"))
+            pLoc.add(Integer.valueOf(str));
 
+        System.out.println("grid size: " + gridSize);
+        System.out.println("intelligence: " + intel);
+        System.out.println("beacons: " + bLoc);
+        System.out.println("pot of gold: " + gLoc);
+        System.out.println("pits: " + pLoc);
 
     }
 }
