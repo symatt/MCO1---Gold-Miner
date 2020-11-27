@@ -50,8 +50,8 @@ public class Miner extends GMObject {
         return direction;
     }
 
-    public Miner(int x, int y) {
-        super(x, y);
+    public Miner() {
+        super(1, 1);
         this.calculateFront();
         this.direction = 2;
         this.numOfMoves = 0;

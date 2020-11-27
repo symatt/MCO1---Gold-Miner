@@ -6,8 +6,9 @@ public class GMObject {
     protected int y = 1;
 
     public GMObject(int x, int y) {
-        this.currLocation[this.x] = x;
-        this.currLocation[this.y] = y;
+        this.currLocation = new int[2];
+        this.currLocation[0] = x;
+        this.currLocation[1] = y;
     }
 
     public int getXPos() {

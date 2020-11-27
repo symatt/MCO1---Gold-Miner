@@ -13,6 +13,12 @@ import miner.Main;
 
 public class InputsController {
 
+    public static String gridSize;
+    public static String pitLoc;
+    public static String goldLoc;
+    public static String beaconLoc;
+    public static String config;
+
     private static Main main;
 
     ObservableList<String> toggleChoicesList = FXCollections.observableArrayList("Random", "Smart") ;
@@ -32,11 +38,11 @@ public class InputsController {
     @FXML
     public void startMiner(ActionEvent actionEvent) {
         System.out.println("Puts in the values from GUI to model and starts the miner");
-        String gridSize = gridSizeField.getText();
-        String pitLoc = pitField.getText();
-        String goldLoc = goldField.getText();
-        String beaconLoc = beaconField.getText();
-        String config = (String) randomSmartBox.getValue();
+        gridSize = gridSizeField.getText();
+        pitLoc = pitField.getText();
+        goldLoc = goldField.getText();
+        beaconLoc = beaconField.getText();
+        config = (String) randomSmartBox.getValue();
         main.closeWindow();
     }
 
