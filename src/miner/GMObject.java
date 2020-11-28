@@ -18,4 +18,6 @@ public class GMObject {
     public int getYPos() {
         return currLocation[y];
     }
+
+    public String getName() { return "Empty";}
 }

@@ -146,7 +146,7 @@ public final class GameProperUI {
         int y = playerPos[1];
 
         // Update position
-        GridPane.clearConstraints(minerImage));
+        GridPane.clearConstraints(minerImage);
         GridPane.setConstraints(minerImage, x, y);
         GridPane.setHalignment(minerImage, HPos.CENTER);
         // Update Orientation
