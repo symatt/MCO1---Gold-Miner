@@ -75,6 +75,7 @@ public class Miner extends GMObject {
     public GMObject scanFront(Board b) {
         this.calculateFront();
         numOfScans++;
+        // check if location is valid
         if (frontLocation[x] <= b.getGridSize() - 1 &&  frontLocation[x] >= 0 &&
                 frontLocation[y] >= 0 && frontLocation[y] <= b.getGridSize() - 1)
             return this.scannedObj = b.getObjectAt(this.getFrontXPos(), this.getFrontYPos());
@@ -83,18 +84,25 @@ public class Miner extends GMObject {
     }
 
     // move the miner's location to its front and replaces its trail with the previous object in that place
+    // this returns the object that is where the miner is headed to
     public GMObject moveMiner(Board b) {
         // check if the next location is within the grid size
         this.calculateFront();
         if (frontLocation[x] <= b.getGridSize() - 1 &&  frontLocation[x] >= 0 &&
                 frontLocation[y] >= 0 && frontLocation[y] <= b.getGridSize() - 1) {
+            // adds the old location to the history
             addMoveToHistory();
+            // set the prevObj 's location back to its original
             b.setObj(this.prevObj);
+            // gets the obj that miner will move to
             this.prevObj = b.getObjectAt(frontLocation[x], frontLocation[y]);
+            // update miner's position
             currLocation[x] = frontLocation[x];
             currLocation[y] = frontLocation[y];
+            // set miner's new position on the board
             b.setObj(this);
             numOfMoves++;
+            // return the original obj on the miner's current position
             return prevObj;
         }
         return null;

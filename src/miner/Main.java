@@ -49,29 +49,30 @@ public class Main extends Application {
 
     // Random agent rationality
     public static void random(Miner m, Board b) {
-        GMObject o;
+        // o is the object that is checked to know whether the game has ended or not
+        // this can be empty, beacon, pit or gold
+        // initialized to null, only can be changed by moving the miner
+        GMObject o = null;
         int move;
         Random rand = new Random();
         do {
             b.showBoard();
+            // gets a random number from 0 to 2
             move = rand.nextInt(3);
             switch (move) {
                 // scans front
                 case 0:
                     System.out.println("SCAN " + m.getDirection());
                     m.scanFront(b);
-                    o = null;
                     break;
                 // rotates once
                 case 1:
                     System.out.println("ROTATE");
                     m.rotateMiner();
-                    o = null;
                     break;
                 // moves miner
                 case 2:
                     System.out.println("MOVE " + m.getDirection());
-
                     o = m.moveMiner(b);
                     break;
                 default:
@@ -83,14 +84,19 @@ public class Main extends Application {
     public static void main(String[] args) {
         launch(args);
 
-        // for testing purposes
+        // initialize a miner
         Miner m = new Miner();
+
+        // get grid size from the UI
         int gridSize = Integer.valueOf(InputsController.gridSize);
+
+        // get the intelligence of the AI from the UI
         String intel = InputsController.config;
+
+        // get beacon, pit and gold locations from the UI
         ArrayList<Integer> bLoc = new ArrayList<>();
         ArrayList<Integer> gLoc = new ArrayList<>();
         ArrayList<Integer> pLoc = new ArrayList<>();
-
         for (String str : InputsController.beaconLoc.split("\\s"))
             bLoc.add(Integer.valueOf(str));
         for (String str : InputsController.goldLoc.split("\\s"))
@@ -98,18 +104,27 @@ public class Main extends Application {
         for (String str : InputsController.pitLoc.split("\\s"))
             pLoc.add(Integer.valueOf(str));
 
+        // debugging tool
         System.out.println("grid size: " + gridSize);
         System.out.println("intelligence: " + intel);
         System.out.println("beacons: " + bLoc);
         System.out.println("pot of gold: " + gLoc);
         System.out.println("pits: " + pLoc);
 
+        // create a board
         Board board = new Board(gridSize);
+        // set the miner
         board.setObj(m);
+        // set the gold
         board.initializeGold(gLoc);
+        // set the pits
         board.initializePits(pLoc);
+        // set the beacons
         board.initializeBeacons(bLoc);
+        // show the board
         board.showBoard();
+
+        // random or intelligent AI
         if (intel.equalsIgnoreCase("random"))
             random(m, board);
         else
