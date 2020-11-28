@@ -1,3 +1,5 @@
+package miner;
+
 import javafx.animation.KeyFrame;
 import javafx.animation.PauseTransition;
 import javafx.animation.Timeline;
@@ -25,10 +27,9 @@ import java.awt.event.MouseEvent;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 
-public final class MainGame {
+public final class GameProperUI {
 
     static Stage window;
-    //
     static Text minerInfo = new Text();
     static VBox leftArea = new VBox();
     static GridPane mapGrid;
@@ -41,9 +42,9 @@ public final class MainGame {
     static Scene stage;
     static ImageView minerImage;
     static Image minerIcon;
-    //
 
     public static void display() {
+        // Creation of two columns
         ColumnConstraints col1 = new ColumnConstraints(250);
         col1.setHalignment(HPos.CENTER);
         mainFrame.getColumnConstraints().add(col1);
@@ -51,6 +52,8 @@ public final class MainGame {
         col2.setHalignment(HPos.CENTER);
         mainFrame.getColumnConstraints().add(col2);
         mainFrame.setGridLinesVisible(true);
+
+        // Building of Map and Miner
         buildMap();
         buildMinerInfo();
         window = new Stage();
