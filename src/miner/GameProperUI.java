@@ -7,25 +7,18 @@ import javafx.beans.value.ChangeListener;
 import javafx.collections.ObservableList;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
-import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
+import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
-import javafx.util.Duration;
+import javafx.scene.control.TextArea;
+import javafx.scene.layout.VBox;
 
-import javafx.scene.shape.*;
-import java.awt.event.MouseEvent;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 
 public final class GameProperUI {
 
@@ -36,7 +29,8 @@ public final class GameProperUI {
     static GridPane mainFrame = new GridPane();
     static StackPane historyStack;
     static Rectangle historyBox;
-    static Text history;
+//    static Text history;
+    static TextArea history;
     static int[][] row;
     static int[][] column;
     static Scene stage;
@@ -45,20 +39,20 @@ public final class GameProperUI {
 
     public static void display() {
         // Creation of two columns
-        ColumnConstraints col1 = new ColumnConstraints(280);
+        ColumnConstraints col1 = new ColumnConstraints(270);
         col1.setHalignment(HPos.CENTER);
         mainFrame.getColumnConstraints().add(col1);
         ColumnConstraints col2 = new ColumnConstraints(774);
         col2.setHalignment(HPos.CENTER);
         mainFrame.getColumnConstraints().add(col2);
-        mainFrame.setGridLinesVisible(true);
+//        mainFrame.setGridLinesVisible(true);
 
         // Building of Map and Miner
         buildMap();
         buildMinerInfo();
         window = new Stage();
         window.setTitle("Gold Miner");
-        stage = new Scene(mainFrame, 1024, 768, Color.GRAY);
+        stage = new Scene(mainFrame, 1024, 758, Color.GRAY);
         window.setScene(stage);
         window.initStyle(StageStyle.DECORATED);
         window.setResizable(false);
@@ -68,23 +62,31 @@ public final class GameProperUI {
     public static void buildMinerInfo() {
         minerInfo.setStyle("-fx-background-color: white;");
         minerInfo.setText("Rotations: 0\nScans: 0\nMoves: 0\n\n");
-        minerInfo.setStyle("-fx-font: 20 Verdana;");
-
+        minerInfo.setStyle("-fx-font: 30 Minecraft;");
         // History Stack
         historyStack = new StackPane();
 
-        // History Box
-        historyBox = new Rectangle(50, 50, 200, 200);
-        historyBox.setFill(Color.ANTIQUEWHITE);
+//        // History Box
+//        historyBox = new Rectangle(50, 50, 200, 200);
+//        historyBox.setFill(Color.ANTIQUEWHITE);
 
         // Travel History
-        history = new Text("Speedrun starts!\n");
-
-        historyStack.getChildren().addAll(historyBox, history);
-        history.setStyle("-fx-font: 10 Verdana;");
+        history = new TextArea("Speedrun starts");
+//        history = new TextArea();
+//        history = new Text("Speedrun starts!\n");
+        history.setStyle("-fx-font: 13 Minecraft;");
+//        Font font = new Font("Minecraft", 20);
+//        history.setFont(font);
+        history.setPrefHeight(600);
+        history.setPrefWidth(50);
+        history.setEditable(false);
+        // History Area scrollbar
+        history.setWrapText(true);
+        leftArea.setSpacing(0);
+        historyStack.getChildren().addAll(history);
         leftArea.getChildren().addAll(minerInfo, historyStack);
         mainFrame.add(leftArea, 0, 0);
-        leftArea.setPadding(new Insets(40, 40, 40, 40));
+        leftArea.setPadding(new Insets(30, 40, 60, 40));
     }
 
     public static void updatePlayerView()
@@ -94,6 +96,7 @@ public final class GameProperUI {
         // playerInfo1.setText("Roatations: " + Game.Miner.getNumOfRotates() + "\n\nScans: " +
         // Game.Miner.getNumOfScans() + "\n\nMoves: " + Game.Miner.getNumOfMoves());
         // Player History
+//        history.setText(history.getText + "action\n");
     }
 
     public static void buildMap()
@@ -101,39 +104,59 @@ public final class GameProperUI {
         mapGrid = new GridPane();
         mapGrid.setGridLinesVisible(true);
 
-        int rowCount = 8;
-        int columnCount = 8;
+        int columnSize = 778;
+        int rowSize = 768;
+        // Dimensions drawn from inputs
+        int rowCount = 14;
+        int columnCount = 14;
         //Situational
         for (int i = 0; i < rowCount; i++)
-            mapGrid.getRowConstraints().add(new RowConstraints(96.125));
+            mapGrid.getRowConstraints().add(new RowConstraints(rowSize / rowCount));
         for (int i = 0; i < columnCount; i++)
-            mapGrid.getColumnConstraints().add(new ColumnConstraints(96));
+            mapGrid.getColumnConstraints().add(new ColumnConstraints(columnSize / columnCount));
 
         // Miner Image
-        minerImage = new ImageView();
-        minerIcon = new Image("/sample/Miner.png");
+        ImageView minerImage = new ImageView();
+        Image minerIcon = new Image("/sample/Miner2.png");
         minerImage.setImage(minerIcon);
         // Situational
-        minerImage.setFitHeight(40);
-        minerImage.setFitWidth(40);
+        minerImage.setFitHeight(rowSize / rowCount / 2);
+        minerImage.setFitWidth(columnSize / columnCount / 2);
+        GridPane.setHalignment(minerImage, HPos.LEFT);
 
-        // Placing of Objects
-//        // Beacons
-//        for (int i = 0; i < bLoc.length(); i++) {
-//            Text beacon = new Text("B");
-//            GridPane.setConstraints(beacon, bLoc.get(i).getXPos, bLoc.get(i).getYPos);
-//        }
-//        // Gold
-//        for (int i = 0; i < gLoc.length(); i++) {
-//            Text beacon = new Text("G");
-//            GridPane.setConstraints(beacon, bLoc.get(i).getXPos, bLoc.get(i).getYPos);
-//        }
-//        // Pits
-//        for (int i = 0; i < pLoc.length(); i++) {
-//            Text beacon = new Text("P");
-//            GridPane.setConstraints(beacon, bLoc.get(i).getXPos, bLoc.get(i).getYPos);
-//        }
-
+        // Beacons
+        for (int i = 0; i < 1; i++) {
+            ImageView bImage = new ImageView();
+            Image bIcon = new Image("/sample/Beacon.png");
+            bImage.setImage(bIcon);
+            bImage.setFitHeight(rowSize / rowCount / 2);
+            bImage.setFitWidth(rowSize / rowCount / 2);
+            GridPane.setHalignment(bImage, HPos.RIGHT);
+            GridPane.setConstraints(bImage, 0, 0);
+            mapGrid.getChildren().addAll(bImage);
+        }
+        // Gold
+        for (int i = 0; i < 1; i++) {
+            ImageView gImage = new ImageView();
+            Image gIcon = new Image("/sample/Gold.png");
+            gImage.setImage(gIcon);
+            gImage.setFitHeight(rowSize / rowCount / 2);
+            gImage.setFitWidth(rowSize / rowCount / 2);
+            GridPane.setHalignment(gImage, HPos.RIGHT);
+            GridPane.setConstraints(gImage, 2, 1);
+            mapGrid.getChildren().addAll(gImage);
+        }
+        // Pits
+        for (int i = 0; i < 1; i++) {
+            ImageView pImage = new ImageView();
+            Image pIcon = new Image("/sample/Lava.png");
+            pImage.setImage(pIcon);
+            pImage.setFitHeight(rowSize / rowCount / 2);
+            pImage.setFitWidth(rowSize / rowCount / 2);
+            GridPane.setHalignment(pImage, HPos.RIGHT);
+            GridPane.setConstraints(pImage, 3, 1);
+            mapGrid.getChildren().addAll(pImage);
+        }
         // Miner Image in grid
         GridPane.setConstraints(minerImage, 0, 0);
 
@@ -146,9 +169,9 @@ public final class GameProperUI {
         int y = playerPos[1];
 
         // Update position
-        GridPane.clearConstraints(minerImage));
+        GridPane.clearConstraints(minerImage);
         GridPane.setConstraints(minerImage, x, y);
-        GridPane.setHalignment(minerImage, HPos.CENTER);
+        GridPane.setHalignment(minerImage, HPos.LEFT);
         // Update Orientation
 //        if (Miner.direction == 1)
 //            minerImage.setRotate(0);
@@ -158,10 +181,5 @@ public final class GameProperUI {
 //            minerImage.setRotate(180);
 //        else if (Miner.direction == 4
 //            minerImage.setRotate(270);
-    }
-    // Alternative to if statements above, will read history instead
-    public static void rotateMiner()
-    {
-        minerImage.setRotate(minerImage.getRotate() + 90);
     }
 }
