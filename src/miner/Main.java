@@ -56,7 +56,6 @@ public class Main extends Application {
         int move;
         Random rand = new Random();
         do {
-            b.showBoard();
             // gets a random number from 0 to 2
             move = rand.nextInt(3);
             switch (move) {
@@ -78,6 +77,9 @@ public class Main extends Application {
                 default:
                     throw new IllegalStateException("Unexpected value: " + move);
             }
+            if (o instanceof Beacon)
+                System.out.println("GOLD IS WITHIN " + ((Beacon) o).beaconScan(b) + " SQUARE/S.");
+            b.showBoard();
         } while (!isGameOver(o));
     }
 
@@ -98,11 +100,14 @@ public class Main extends Application {
         ArrayList<Integer> gLoc = new ArrayList<>();
         ArrayList<Integer> pLoc = new ArrayList<>();
         for (String str : InputsController.beaconLoc.split("\\s"))
-            bLoc.add(Integer.valueOf(str));
+            if (!str.equals(""))
+                bLoc.add(Integer.valueOf(str));
         for (String str : InputsController.goldLoc.split("\\s"))
-            gLoc.add(Integer.valueOf(str));
+            if (!str.equals(""))
+                gLoc.add(Integer.valueOf(str));
         for (String str : InputsController.pitLoc.split("\\s"))
-            pLoc.add(Integer.valueOf(str));
+            if (!str.equals(""))
+                pLoc.add(Integer.valueOf(str));
 
         // debugging tool
         System.out.println("grid size: " + gridSize);
