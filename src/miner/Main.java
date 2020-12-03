@@ -8,9 +8,10 @@ import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import miner.GUI.InputsController;
 
+import java.awt.desktop.SystemSleepEvent;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Random;
+import java.lang.reflect.Array;
+import java.util.*;
 
 public class Main extends Application {
     private static Stage primaryStage;
@@ -83,6 +84,152 @@ public class Main extends Application {
         } while (!isGameOver(o));
     }
 
+
+
+    public static void intelligent(Miner m, Board b) {
+        PriorityQueue<GMObject> scPlaces = new PriorityQueue<>(); // make the toCompare() in GMObject
+        boolean foundGold = false;
+        int rotateCtr = 0, beaconMoveCtr = 0;
+        GMObject scObj;
+
+        while (!foundGold) {
+            while(rotateCtr < 4) {
+                scObj = m.scanFront(b);
+//                System.out.println("Miner's current location: " + m.getXPos() + ", " + m.getYPos());
+//                System.out.println(m.getDirection());
+//                if (scObj != null) {
+//                    System.out.println(scObj.getName());
+//                }
+                if (scObj instanceof Gold) {
+                    m.moveMiner(b);
+                    foundGold = true;
+//                    System.out.println(m.getPreviousLocations());
+                    System.out.println("YOU WIN!");
+                    break;
+                }
+                else if (scObj == null) {
+                    m.rotateMiner();
+                    rotateCtr++;
+                }
+                else {
+                    if (m.didVisit(scObj.getXPos(), scObj.getYPos())) scObj.setVal(0);
+                    scPlaces.add(scObj);
+                    m.rotateMiner();
+                    rotateCtr++;
+                }
+            }
+
+//            GMObject[] events = scPlaces.toArray(new GMObject[scPlaces.size()]);
+//            Arrays.sort(events, scPlaces.comparator());
+//            for (GMObject e : events) {
+//                System.out.println("obj name: " + e.getName() + " AT " + e.getXPos() + ", " + e.getYPos() + " with value: " + e.getVal());
+//            }
+            if (!foundGold) {
+                rotateCtr = 0;
+                // pop out the direction
+                GMObject goObj = scPlaces.remove();
+                int xPosDir = goObj.getXPos();
+                int yPosDir = goObj.getYPos();
+//                System.out.println("GO TO THIS OBJ: " + goObj.getName() + " AT " + xPosDir + ", " + yPosDir);
+
+                if (xPosDir == m.getXPos()) {
+                    if (yPosDir > m.getYPos()) {
+                        // move down
+                        while (!m.getDirection().equalsIgnoreCase("DOWN"))
+                            m.rotateMiner();
+                    } else {
+                        // move up
+                        while (!m.getDirection().equalsIgnoreCase("UP"))
+                            m.rotateMiner();
+                    }
+                } else {
+                    if (xPosDir > m.getXPos()) {
+                        // move right
+                        while (!m.getDirection().equalsIgnoreCase("RIGHT"))
+                            m.rotateMiner();
+                    } else {
+                        // move left
+                        while (!m.getDirection().equalsIgnoreCase("LEFT"))
+                            m.rotateMiner();
+                    }
+                }
+
+                GMObject prevObj = m.moveMiner(b);
+                if (prevObj instanceof Beacon) {
+//                    System.out.println("BEACON BEACON BEACON");
+                    int howFar = ((Beacon) prevObj).beaconScan(b);
+//                    System.out.println("HOW FAR IS GOLD: " + howFar);
+                    if (howFar != 0) {
+                        System.out.println("BEACON IS BEING USED.");
+                        while (rotateCtr < 4) {
+//                            System.out.println("Miner's current location: " + m.getXPos() + ", " + m.getYPos());
+//                            System.out.println(m.getDirection());
+                            scObj = m.scanFront(b);
+//                            if (scObj != null) {
+//                                System.out.println("SCANNED OBJ: " + scObj.getName());
+//                            }
+                            if (scObj instanceof Gold) {
+                                m.moveMiner(b);
+                                foundGold = true;
+                                System.out.println(m.getPreviousLocations());
+                                System.out.println("USING A BEACON, YOU WIN!");
+                                break;
+                            } else if (beaconMoveCtr == howFar) {
+                                m.rotateMiner();
+                                m.rotateMiner();
+                                for (int i = 1; i <= howFar; i++)
+                                    m.moveMiner(b);
+                                beaconMoveCtr = 0;
+                                m.rotateMiner();
+                                m.rotateMiner();
+                                m.rotateMiner();
+                                rotateCtr++;
+                            }
+                            else if (scObj instanceof Pit || scObj instanceof Beacon) {
+                                m.rotateMiner();
+                                m.rotateMiner();
+                                for (int i = 1; i <= beaconMoveCtr; i++)
+                                    m.moveMiner(b);
+                                beaconMoveCtr = 0;
+                                m.rotateMiner();
+                                m.rotateMiner();
+                                m.rotateMiner();
+                                rotateCtr++;
+                            } else if (m.didVisit(scObj.getXPos(), scObj.getYPos())) {
+                                m.rotateMiner();
+                                m.rotateMiner();
+                                for (int i = 1; i <= beaconMoveCtr; i++)
+                                    m.moveMiner(b);
+                                beaconMoveCtr = 0;
+                                m.rotateMiner();
+                                m.rotateMiner();
+                                m.rotateMiner();
+                                rotateCtr++;
+                            }
+                            else if (scObj instanceof Empty){
+                                m.moveMiner(b);
+                                beaconMoveCtr++;
+                            }
+                            else if (scObj == null){
+                                m.rotateMiner();
+                                rotateCtr++;
+                            }
+                        }
+                    }
+                }
+                rotateCtr = 0;
+
+                if (prevObj instanceof Pit) {
+                    foundGold = true;
+                    System.out.println("GAME OVER");
+                }
+
+                scPlaces.clear();
+            }
+        }
+    }
+
+
     public static void main(String[] args) {
         launch(args);
 
@@ -133,7 +280,7 @@ public class Main extends Application {
         if (intel.equalsIgnoreCase("random"))
             random(m, board);
         else
-            System.out.println("Intelligent");
+            intelligent(m, board);
 
 //        System.out.println(m.scanFront(board).getName());
 //        m.moveMiner(board);

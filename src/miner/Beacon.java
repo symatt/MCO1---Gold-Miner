@@ -1,8 +1,9 @@
 package miner;
 
-public class Beacon extends  GMObject {
+public class Beacon extends GMObject implements Comparable<GMObject> {
     public Beacon(int x, int y) {
         super(x, y);
+        this.val = 9;
     }
 
     @Override
@@ -21,11 +22,11 @@ public class Beacon extends  GMObject {
     }
 
     public int scanDirection(int direction, Board b) {
-        int scanX = this.x, scanY = this.y;
+        int scanX = this.getXPos(), scanY = this.getYPos();
         switch (direction) {
             case 1:
                 // UP
-                for (int i = 1; i <= b.getGridSize(); i++) {
+                for (int i = 1; i <= b.getGridSize() - scanY; i++) {
                     if ( scanY - i == -1 || b.getObjectAt(scanX, scanY - i) instanceof Pit)
                         return 0;
                     else if (b.getObjectAt(scanX, scanY - i) instanceof Gold)
@@ -34,8 +35,8 @@ public class Beacon extends  GMObject {
                 break;
             case 2:
                 // RIGHT
-                for (int i = 1; i < b.getGridSize(); i++) {
-                    if (scanX + i == 8 || b.getObjectAt(scanX + i, scanY) instanceof Pit )
+                for (int i = 1; i <= b.getGridSize() - scanX; i++) {
+                    if (scanX + i >= b.getGridSize() || b.getObjectAt(scanX + i, scanY) instanceof Pit )
                         return 0;
                     else if (b.getObjectAt(scanX + i, scanY) instanceof Gold)
                         return i;
@@ -43,8 +44,8 @@ public class Beacon extends  GMObject {
                 break;
             case 3:
                 // DOWN
-                for (int i = 1; i < b.getGridSize(); i++) {
-                    if (scanY + i == 8 || b.getObjectAt(scanX, scanY + i) instanceof Pit)
+                for (int i = 1; i <= b.getGridSize() - scanY; i++) {
+                    if (scanY + i >= b.getGridSize() || b.getObjectAt(scanX, scanY + i) instanceof Pit)
                         return 0;
                     else if (b.getObjectAt(scanX, scanY + i) instanceof Gold)
                         return i;
@@ -52,8 +53,8 @@ public class Beacon extends  GMObject {
                 break;
             case 4:
                 // LEFT
-                for (int i = 1; i < b.getGridSize(); i++) {
-                    if (scanX - i == -1 || b.getObjectAt(scanX, scanY - i) instanceof Pit)
+                for (int i = 1; i <= b.getGridSize() - scanX; i++) {
+                    if (scanX - i == -1 || b.getObjectAt(scanX - i, scanY) instanceof Pit)
                         return 0;
                     else if (b.getObjectAt(scanX - i, scanY) instanceof Gold)
                         return i;
