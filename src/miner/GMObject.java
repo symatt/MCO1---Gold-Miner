@@ -45,6 +45,9 @@ public class GMObject implements Comparable<GMObject> {
 
     @Override
     public int compareTo(GMObject obj) {
+        // compares the values of the GMObjects
+        // special case for the empty spaces which take into consideration the number of adjacent squares that it has
+        // those empty spaces are given a higher priority than the less number of adjacent squares
         if (this.getVal() > obj.getVal())
             return -1;
         else if (this.getVal() < obj.getVal())

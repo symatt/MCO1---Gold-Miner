@@ -85,21 +85,31 @@ public class Main extends Application {
     }
 
 
-
+    // the miner uses an algorithm in order to find the gold on the board
     public static void intelligent(Miner m, Board b) {
-        PriorityQueue<GMObject> scPlaces = new PriorityQueue<>(); // make the toCompare() in GMObject
+        // scPlaces is a priorityQueue which is needed to evaluate which direction the miner should choose to go
+        // the toCompare() function is customized in the GMObject class
+        PriorityQueue<GMObject> scPlaces = new PriorityQueue<>();
         boolean foundGold = false;
-        int rotateCtr = 0, beaconMoveCtr = 0;
-        GMObject scObj;
+        int rotateCtr = 0, beaconMoveCtr = 0; // number of rotates and number of moves when beacon is in use
+        GMObject scObj; // scanned object
 
+        // loop through the board while the gold is not found or a pit is the only space that can be moved to
         while (!foundGold) {
+            // rotate 4 times to scan all the directions adjacent to the current position of the miner
             while(rotateCtr < 4) {
+                // scan the front of the current direction
                 scObj = m.scanFront(b);
 //                System.out.println("Miner's current location: " + m.getXPos() + ", " + m.getYPos());
 //                System.out.println(m.getDirection());
 //                if (scObj != null) {
 //                    System.out.println(scObj.getName());
 //                }
+
+                // check what type of object was scanned
+                // gold = move to that square and the miner wins
+                // if its a null (not a valid square, i.e. an edge), rotate the miner
+                // otherwise, push into the PQ and rotate the miner
                 if (scObj instanceof Gold) {
                     m.moveMiner(b);
                     foundGold = true;
@@ -112,6 +122,7 @@ public class Main extends Application {
                     rotateCtr++;
                 }
                 else {
+                    // check first if the space has been visited so it is a low priority
                     if (m.didVisit(scObj.getXPos(), scObj.getYPos())) scObj.setVal(0);
                     scPlaces.add(scObj);
                     m.rotateMiner();
@@ -124,9 +135,11 @@ public class Main extends Application {
 //            for (GMObject e : events) {
 //                System.out.println("obj name: " + e.getName() + " AT " + e.getXPos() + ", " + e.getYPos() + " with value: " + e.getVal());
 //            }
+
+            //execute only when gold has not been found
             if (!foundGold) {
                 rotateCtr = 0;
-                // pop out the direction
+                // pop out the object out and find the direction of that square
                 GMObject goObj = scPlaces.remove();
                 int xPosDir = goObj.getXPos();
                 int yPosDir = goObj.getYPos();
@@ -154,11 +167,16 @@ public class Main extends Application {
                     }
                 }
 
+                // move the miner to the priority space popped out from the PQ
                 GMObject prevObj = m.moveMiner(b);
+                // check if it was a beacon
                 if (prevObj instanceof Beacon) {
 //                    System.out.println("BEACON BEACON BEACON");
+                    // get how far the gold is from the beacon
                     int howFar = ((Beacon) prevObj).beaconScan(b);
 //                    System.out.println("HOW FAR IS GOLD: " + howFar);
+                    // if the beacon tells us 0, that means that a pit is covering the gold, so proceed back to the earlier algorithm
+                    // in the case that it is not 0, search each direction by scanning and moving along each of the 4 directions of the beacon
                     if (howFar != 0) {
                         System.out.println("BEACON IS BEING USED.");
                         while (rotateCtr < 4) {
@@ -175,6 +193,8 @@ public class Main extends Application {
                                 System.out.println("USING A BEACON, YOU WIN!");
                                 break;
                             } else if (beaconMoveCtr == howFar) {
+                                // check if the number of steps is equal to the beacon's signal
+                                // move the miner back to the position of the beacon
                                 m.rotateMiner();
                                 m.rotateMiner();
                                 for (int i = 1; i <= howFar; i++)
@@ -186,6 +206,7 @@ public class Main extends Application {
                                 rotateCtr++;
                             }
                             else if (scObj instanceof Pit || scObj instanceof Beacon) {
+                                // if its a pit or beacon that was scanned, go back to the position of the first beacon
                                 m.rotateMiner();
                                 m.rotateMiner();
                                 for (int i = 1; i <= beaconMoveCtr; i++)
@@ -196,6 +217,7 @@ public class Main extends Application {
                                 m.rotateMiner();
                                 rotateCtr++;
                             } else if (m.didVisit(scObj.getXPos(), scObj.getYPos())) {
+                                // if it was visited square already, return to the beacon's position
                                 m.rotateMiner();
                                 m.rotateMiner();
                                 for (int i = 1; i <= beaconMoveCtr; i++)
@@ -207,10 +229,12 @@ public class Main extends Application {
                                 rotateCtr++;
                             }
                             else if (scObj instanceof Empty){
+                                // if it is empty, move the miner
                                 m.moveMiner(b);
                                 beaconMoveCtr++;
                             }
                             else if (scObj == null){
+                                // rotate the miner if it scans a non valid square (i.e. edges)
                                 m.rotateMiner();
                                 rotateCtr++;
                             }
@@ -219,11 +243,13 @@ public class Main extends Application {
                 }
                 rotateCtr = 0;
 
+                // if there is no choice but a pit, foundGold is changed to true to stop the loop but the output is a game over.
                 if (prevObj instanceof Pit) {
                     foundGold = true;
                     System.out.println("GAME OVER");
                 }
 
+                // the PQ is emptied out
                 scPlaces.clear();
             }
         }
