@@ -108,6 +108,17 @@ public class Miner extends GMObject {
         return null;
     }
 
+    public boolean didVisit(int objX, int objY) {
+//        System.out.println("PREVIOUS LOCATIONS");
+        for (int i = 0; i < previousLocations.size(); i++) {
+//            System.out.println("X: " + previousLocations.get(i).get(0) + " Y: " + previousLocations.get(i).get(1));
+            if (previousLocations.get(i).get(0) == objX && previousLocations.get(i).get(1) == objY)
+                return true;
+        }
+
+        return false;
+    }
+
     public int getFrontXPos() { return frontLocation[x]; }
 
     public int getFrontYPos() {
