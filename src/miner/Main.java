@@ -8,18 +8,21 @@ import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import miner.GUI.InputsController;
 
-import java.awt.desktop.SystemSleepEvent;
+//import java.awt.desktop.SystemSleepEvent;
 import java.io.IOException;
 import java.lang.reflect.Array;
 import java.util.*;
+import java.lang.Thread;
 
 public class Main extends Application {
     private static Stage primaryStage;
+    public static int speed;
 
     @Override
     public void start(Stage primaryStage) throws Exception {
         this.primaryStage = primaryStage;
         this.primaryStage.setTitle("Gold Miner");
+        this.speed = 600;
         showInputMenu();
         //InputBox.display();
     }
@@ -39,10 +42,12 @@ public class Main extends Application {
     public static boolean isGameOver(GMObject o) {
         if (o instanceof Pit) {
             System.out.println("GAME OVER.");
+            InputsController.updateHistory("GAME OVER.");
             return true;
         }
         else if (o instanceof Gold) {
             System.out.println("YOU WIN!");
+            InputsController.updateHistory("YOU WIN!");
             return true;
         }
         return false;
@@ -63,24 +68,41 @@ public class Main extends Application {
                 // scans front
                 case 0:
                     System.out.println("SCAN " + m.getDirection());
+                    InputsController.updateHistory("SCAN " + m.getDirection());
                     m.scanFront(b);
                     break;
                 // rotates once
                 case 1:
                     System.out.println("ROTATE");
+                    InputsController.updateHistory("ROTATE");
                     m.rotateMiner();
                     break;
                 // moves miner
                 case 2:
                     System.out.println("MOVE " + m.getDirection());
+                    InputsController.updateHistory("MOVE " + m.getDirection());
                     o = m.moveMiner(b);
                     break;
                 default:
                     throw new IllegalStateException("Unexpected value: " + move);
             }
             if (o instanceof Beacon)
+            {
                 System.out.println("GOLD IS WITHIN " + ((Beacon) o).beaconScan(b) + " SQUARE/S.");
+                InputsController.updateHistory("GOLD IS WITHIN " + ((Beacon) o).beaconScan(b) + " SQUARE/S.");
+            }
+
             b.showBoard();
+            InputsController.updateMiner(m);
+            InputsController.updateMinerInfo(m);
+            // Delay part (5000 will be replaced with slider)
+            try {
+                Thread.sleep(speed);
+            }
+            catch (Exception e)
+            {
+                System.out.println(e);
+            }
         } while (!isGameOver(o));
     }
 
@@ -112,13 +134,18 @@ public class Main extends Application {
                 // otherwise, push into the PQ and rotate the miner
                 if (scObj instanceof Gold) {
                     m.moveMiner(b);
+                    System.out.println("MOVE " + m.getDirection());
+                    InputsController.updateHistory("MOVE " + m.getDirection());
                     foundGold = true;
 //                    System.out.println(m.getPreviousLocations());
                     System.out.println("YOU WIN!");
+                    InputsController.updateHistory("YOU WIN!");
                     break;
                 }
                 else if (scObj == null) {
                     m.rotateMiner();
+                    System.out.println("ROTATE");
+                    InputsController.updateHistory("ROTATE");
                     rotateCtr++;
                 }
                 else {
@@ -126,6 +153,8 @@ public class Main extends Application {
                     if (m.didVisit(scObj.getXPos(), scObj.getYPos())) scObj.setVal(0);
                     scPlaces.add(scObj);
                     m.rotateMiner();
+                    System.out.println("ROTATE");
+                    InputsController.updateHistory("ROTATE");
                     rotateCtr++;
                 }
             }
@@ -148,27 +177,41 @@ public class Main extends Application {
                 if (xPosDir == m.getXPos()) {
                     if (yPosDir > m.getYPos()) {
                         // move down
-                        while (!m.getDirection().equalsIgnoreCase("DOWN"))
+                        while (!m.getDirection().equalsIgnoreCase("DOWN")) {
                             m.rotateMiner();
+                            System.out.println("ROTATE");
+                            InputsController.updateHistory("ROTATE");
+                        }
                     } else {
                         // move up
-                        while (!m.getDirection().equalsIgnoreCase("UP"))
+                        while (!m.getDirection().equalsIgnoreCase("UP")){
                             m.rotateMiner();
+                            System.out.println("ROTATE");
+                            InputsController.updateHistory("ROTATE");
+                        }
                     }
                 } else {
                     if (xPosDir > m.getXPos()) {
                         // move right
-                        while (!m.getDirection().equalsIgnoreCase("RIGHT"))
+                        while (!m.getDirection().equalsIgnoreCase("RIGHT")){
                             m.rotateMiner();
+                            System.out.println("ROTATE");
+                            InputsController.updateHistory("ROTATE");
+                        }
                     } else {
                         // move left
-                        while (!m.getDirection().equalsIgnoreCase("LEFT"))
+                        while (!m.getDirection().equalsIgnoreCase("LEFT")){
                             m.rotateMiner();
+                            System.out.println("ROTATE");
+                            InputsController.updateHistory("ROTATE");
+                        }
                     }
                 }
 
                 // move the miner to the priority space popped out from the PQ
                 GMObject prevObj = m.moveMiner(b);
+                System.out.println("MOVE " + m.getDirection());
+                InputsController.updateHistory("MOVE " + m.getDirection());
                 // check if it was a beacon
                 if (prevObj instanceof Beacon) {
 //                    System.out.println("BEACON BEACON BEACON");
@@ -179,6 +222,7 @@ public class Main extends Application {
                     // in the case that it is not 0, search each direction by scanning and moving along each of the 4 directions of the beacon
                     if (howFar != 0) {
                         System.out.println("BEACON IS BEING USED.");
+                        InputsController.updateHistory("BEACON IS BEING USED.");
                         while (rotateCtr < 4) {
 //                            System.out.println("Miner's current location: " + m.getXPos() + ", " + m.getYPos());
 //                            System.out.println(m.getDirection());
@@ -188,55 +232,77 @@ public class Main extends Application {
 //                            }
                             if (scObj instanceof Gold) {
                                 m.moveMiner(b);
+                                System.out.println("MOVE " + m.getDirection());
+                                InputsController.updateHistory("MOVE " + m.getDirection());
                                 foundGold = true;
                                 System.out.println(m.getPreviousLocations());
                                 System.out.println("USING A BEACON, YOU WIN!");
+                                InputsController.updateHistory("USING A BEACON, YOU WIN!");
                                 break;
                             } else if (beaconMoveCtr == howFar) {
                                 // check if the number of steps is equal to the beacon's signal
                                 // move the miner back to the position of the beacon
                                 m.rotateMiner();
                                 m.rotateMiner();
-                                for (int i = 1; i <= howFar; i++)
+                                for (int i = 1; i <= howFar; i++){
                                     m.moveMiner(b);
+                                    System.out.println("MOVE " + m.getDirection());
+                                    InputsController.updateHistory("MOVE " + m.getDirection());
+                                }
                                 beaconMoveCtr = 0;
                                 m.rotateMiner();
                                 m.rotateMiner();
                                 m.rotateMiner();
                                 rotateCtr++;
+                                System.out.println("ROTATE");
+                                InputsController.updateHistory("ROTATE");
                             }
                             else if (scObj instanceof Pit || scObj instanceof Beacon) {
                                 // if its a pit or beacon that was scanned, go back to the position of the first beacon
                                 m.rotateMiner();
                                 m.rotateMiner();
-                                for (int i = 1; i <= beaconMoveCtr; i++)
+                                for (int i = 1; i <= beaconMoveCtr; i++) {
                                     m.moveMiner(b);
+                                    System.out.println("MOVE " + m.getDirection());
+                                    InputsController.updateHistory("MOVE " + m.getDirection());
+                                }
                                 beaconMoveCtr = 0;
                                 m.rotateMiner();
                                 m.rotateMiner();
                                 m.rotateMiner();
                                 rotateCtr++;
+                                System.out.println("ROTATE");
+                                InputsController.updateHistory("ROTATE");
                             } else if (m.didVisit(scObj.getXPos(), scObj.getYPos())) {
                                 // if it was visited square already, return to the beacon's position
                                 m.rotateMiner();
                                 m.rotateMiner();
-                                for (int i = 1; i <= beaconMoveCtr; i++)
+                                for (int i = 1; i <= beaconMoveCtr; i++){
                                     m.moveMiner(b);
+                                    System.out.println("MOVE " + m.getDirection());
+                                    InputsController.updateHistory("MOVE " + m.getDirection());
+                                }
                                 beaconMoveCtr = 0;
                                 m.rotateMiner();
                                 m.rotateMiner();
                                 m.rotateMiner();
                                 rotateCtr++;
+                                System.out.println("ROTATE");
+                                InputsController.updateHistory("ROTATE");
                             }
                             else if (scObj instanceof Empty){
                                 // if it is empty, move the miner
                                 m.moveMiner(b);
+                                System.out.println("MOVE " + m.getDirection());
+                                InputsController.updateHistory("MOVE " + m.getDirection());
                                 beaconMoveCtr++;
                             }
                             else if (scObj == null){
                                 // rotate the miner if it scans a non valid square (i.e. edges)
                                 m.rotateMiner();
                                 rotateCtr++;
+                                System.out.println("ROTATE");
+                                InputsController.updateHistory("ROTATE");
                             }
                         }
                     }
@@ -251,6 +317,16 @@ public class Main extends Application {
 
                 // the PQ is emptied out
                 scPlaces.clear();
+            }
+            b.showBoard();
+            InputsController.updateMiner(m);
+            InputsController.updateMinerInfo(m);
+            try {
+                Thread.sleep(speed);
+            }
+            catch (Exception e)
+            {
+                System.out.println(e);
             }
         }
     }
@@ -303,10 +379,14 @@ public class Main extends Application {
         board.showBoard();
 
         // random or intelligent AI
-        if (intel.equalsIgnoreCase("random"))
+        if (intel.equalsIgnoreCase("random")){
+            InputsController.startGame(gridSize);
             random(m, board);
-        else
+        }
+        else {
             intelligent(m, board);
+            InputsController.startGame(gridSize);
+        }
 
 //        System.out.println(m.scanFront(board).getName());
 //        m.moveMiner(board);
