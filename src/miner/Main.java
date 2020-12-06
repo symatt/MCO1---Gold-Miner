@@ -260,7 +260,11 @@ public class Main extends Application {
                             else if (scObj instanceof Pit || scObj instanceof Beacon) {
                                 // if its a pit or beacon that was scanned, go back to the position of the first beacon
                                 m.rotateMiner();
+                                System.out.println("ROTATE");
+                                InputsController.updateHistory("ROTATE");
                                 m.rotateMiner();
+                                System.out.println("ROTATE");
+                                InputsController.updateHistory("ROTATE");
                                 for (int i = 1; i <= beaconMoveCtr; i++) {
                                     m.moveMiner(b);
                                     System.out.println("MOVE " + m.getDirection());
@@ -268,7 +272,11 @@ public class Main extends Application {
                                 }
                                 beaconMoveCtr = 0;
                                 m.rotateMiner();
+                                System.out.println("ROTATE");
+                                InputsController.updateHistory("ROTATE");
                                 m.rotateMiner();
+                                System.out.println("ROTATE");
+                                InputsController.updateHistory("ROTATE");
                                 m.rotateMiner();
                                 rotateCtr++;
                                 System.out.println("ROTATE");
@@ -276,7 +284,11 @@ public class Main extends Application {
                             } else if (m.didVisit(scObj.getXPos(), scObj.getYPos())) {
                                 // if it was visited square already, return to the beacon's position
                                 m.rotateMiner();
+                                System.out.println("ROTATE");
+                                InputsController.updateHistory("ROTATE");
                                 m.rotateMiner();
+                                System.out.println("ROTATE");
+                                InputsController.updateHistory("ROTATE");
                                 for (int i = 1; i <= beaconMoveCtr; i++){
                                     m.moveMiner(b);
                                     System.out.println("MOVE " + m.getDirection());
@@ -284,7 +296,11 @@ public class Main extends Application {
                                 }
                                 beaconMoveCtr = 0;
                                 m.rotateMiner();
+                                System.out.println("ROTATE");
+                                InputsController.updateHistory("ROTATE");
                                 m.rotateMiner();
+                                System.out.println("ROTATE");
+                                InputsController.updateHistory("ROTATE");
                                 m.rotateMiner();
                                 rotateCtr++;
                                 System.out.println("ROTATE");
@@ -380,12 +396,16 @@ public class Main extends Application {
 
         // random or intelligent AI
         if (intel.equalsIgnoreCase("random")){
-            InputsController.startGame(gridSize);
+//            InputsController.startGame(board);
+            Main.primaryStage.setScene(GameProperUI.generateMainFrame(board));
             random(m, board);
+
         }
         else {
+            Main.primaryStage.setScene(GameProperUI.generateMainFrame(board));
             intelligent(m, board);
-            InputsController.startGame(gridSize);
+//            InputsController.startGame(board);
+
         }
 
 //        System.out.println(m.scanFront(board).getName());

@@ -46,7 +46,7 @@ public class InputsController {
         goldLoc = goldField.getText();
         beaconLoc = beaconField.getText();
         config = (String) randomSmartBox.getValue();
-        main.closeWindow();
+//        main.closeWindow();
     }
 
     @FXML
@@ -55,12 +55,13 @@ public class InputsController {
         randomSmartBox.setItems(toggleChoicesList);
     }
 
-    public static void startGame(int dimensions)
+    public static void startGame(Board board)
     {
         Platform.runLater(new Runnable() {
             @Override
             public void run() {
-                  GameProperUI.display(dimensions);
+                System.out.println("MAPSHOWYES");
+//                  GameProperUI.display(board);
             }
         });
     }

@@ -31,12 +31,13 @@ public final class GameProperUI {
     static ImageView minerImage = new ImageView();
     static Image mIcon = new Image("/miner/Miner2.png");
     static Miner m;
-    static Board b;
+    static Board board;
     static final int columnSize = 778;
     static final int rowSize = 768;
 
-    public static void display(int dimensions) {
+    public static Scene generateMainFrame(Board board) {
         // Creation of two columns
+        GameProperUI.board = board;
         mainFrame = new GridPane();
         ColumnConstraints col1 = new ColumnConstraints(270);
         col1.setHalignment(HPos.CENTER);
@@ -47,15 +48,21 @@ public final class GameProperUI {
 //        mainFrame.setGridLinesVisible(true);
 
         // Building of Map and Miner
-        buildGrid(dimensions);
-        buildMinerInfo();
+
         stage = new Scene(mainFrame, 1024, 758, Color.GRAY);
-        window = new Stage();
-        window.setTitle("Gold Miner");
-        window.setScene(stage);
-        window.initStyle(StageStyle.DECORATED);
-        window.setResizable(false);
-        window.show();
+        return stage;
+//        window = new Stage();
+//        window.setTitle("Gold Miner");
+//        window.setScene(stage);
+//        window.initStyle(StageStyle.DECORATED);
+//        window.setResizable(false);
+//        window.show();
+    }
+
+    public static void buildAllData()
+    {
+        buildGrid(board);
+        buildMinerInfo();
     }
 
     public static void buildMinerInfo() {
@@ -103,7 +110,7 @@ public final class GameProperUI {
 //        history.setText(history.getText + "action\n");
     }
 
-    public static void buildGrid(int dimensions)
+    public static void buildGrid(Board b)
     {
         mapGrid = new GridPane();
         mapGrid.setGridLinesVisible(true);
