@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.lang.reflect.Array;
 import java.util.*;
 import java.lang.Thread;
+import java.util.concurrent.TimeUnit;
 
 public class Main extends Application {
     private static Stage primaryStage;
@@ -23,7 +24,7 @@ public class Main extends Application {
     public void start(Stage primaryStage) throws Exception {
         this.primaryStage = primaryStage;
         this.primaryStage.setTitle("Gold Miner");
-        this.speed = 600;
+        this.speed = 1000;
         showInputMenu();
         //InputBox.display();
     }
@@ -351,70 +352,6 @@ public class Main extends Application {
 
     public static void main(String[] args) {
         launch(args);
-
-        // initialize a miner
-        Miner m = new Miner();
-
-        // get grid size from the UI
-        int gridSize = Integer.valueOf(InputsController.gridSize);
-
-        // get the intelligence of the AI from the UI
-        String intel = InputsController.config;
-
-        // get beacon, pit and gold locations from the UI
-        ArrayList<Integer> bLoc = new ArrayList<>();
-        ArrayList<Integer> gLoc = new ArrayList<>();
-        ArrayList<Integer> pLoc = new ArrayList<>();
-        for (String str : InputsController.beaconLoc.split("\\s"))
-            if (!str.equals(""))
-                bLoc.add(Integer.valueOf(str));
-        for (String str : InputsController.goldLoc.split("\\s"))
-            if (!str.equals(""))
-                gLoc.add(Integer.valueOf(str));
-        for (String str : InputsController.pitLoc.split("\\s"))
-            if (!str.equals(""))
-                pLoc.add(Integer.valueOf(str));
-
-        // debugging tool
-        System.out.println("grid size: " + gridSize);
-        System.out.println("intelligence: " + intel);
-        System.out.println("beacons: " + bLoc);
-        System.out.println("pot of gold: " + gLoc);
-        System.out.println("pits: " + pLoc);
-
-        // create a board
-        Board board = new Board(gridSize);
-        // set the miner
-        board.setObj(m);
-        // set the gold
-        board.initializeGold(gLoc);
-        // set the pits
-        board.initializePits(pLoc);
-        // set the beacons
-        board.initializeBeacons(bLoc);
-        // show the board
-        board.showBoard();
-
-        // random or intelligent AI
-        if (intel.equalsIgnoreCase("random")){
-//            InputsController.startGame(board);
-            Platform.runLater(new Runnable() {
-                @Override
-                public void run() {
-                    System.out.println("MAPSHOWYES");
-//                  GameProperUI.display(board);
-                }
-            });
-
-            random(m, board);
-
-        }
-        else {
-            Main.primaryStage.setScene(GameProperUI.generateMainFrame(board));
-            intelligent(m, board);
-//            InputsController.startGame(board);
-
-        }
 
 //        System.out.println(m.scanFront(board).getName());
 //        m.moveMiner(board);
