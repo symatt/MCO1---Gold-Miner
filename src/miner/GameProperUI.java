@@ -48,8 +48,8 @@ public final class GameProperUI {
 //        mainFrame.setGridLinesVisible(true);
 
         // Building of Map and Miner
-
-        buildAllData();
+        buildGrid(board);
+        buildMinerInfo();
         stage = new Scene(mainFrame, 1024, 758, Color.GRAY);
         return stage;
 //        window = new Stage();
@@ -60,11 +60,8 @@ public final class GameProperUI {
 //        window.show();
     }
 
-    public static void buildAllData()
-    {
-        buildGrid(board);
-        buildMinerInfo();
-    }
+//    public static void buildAllData()
+//    {}
 
     public static void buildMinerInfo() {
         minerInfo.setStyle("-fx-background-color: white;");
