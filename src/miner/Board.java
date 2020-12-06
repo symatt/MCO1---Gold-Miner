@@ -1,5 +1,7 @@
 package miner;
 
+import miner.GUI.InputsController;
+
 import java.util.ArrayList;
 
 public class Board {
@@ -29,6 +31,7 @@ public class Board {
     public void initializeGold(ArrayList<Integer> g) {
         int gX = g.get(0) - 1, gY = g.get(1) - 1;
         board.get(gY).set(gX, new Gold(gX, gY));
+//        InputsController.buildGold(this, gY, gX);
     }
 
     // initializes the pits input by the user
@@ -36,6 +39,7 @@ public class Board {
         for (int i = 0; 2* i + 1 < p.size(); i++) {
             int pitX = p.get(2 * i) - 1, pitY = p.get(2 * i + 1) - 1;
             board.get(pitY).set(pitX, new Pit(pitX, pitY));
+//            InputsController.buildPits(this, pitY, pitX);
         }
     }
 
@@ -44,6 +48,7 @@ public class Board {
         for (int i = 0; 2* i + 1 < b.size(); i++) {
             int beaconX = b.get(2 * i) - 1, beaconY = b.get(2 * i + 1) - 1;
             board.get(beaconY).set(beaconX, new Beacon(beaconX, beaconY));
+//            InputsController.buildBeacons(this, beaconY, beaconX);
         }
 
 //        for (int i = 0; i < 8; i++) {
@@ -89,6 +94,4 @@ public class Board {
         }
         System.out.println();
     }
-
-
 }

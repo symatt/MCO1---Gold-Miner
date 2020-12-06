@@ -6,19 +6,23 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
+import jdk.internal.util.xml.impl.Input;
 import miner.GUI.InputsController;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Random;
+import java.lang.Thread;
 
 public class Main extends Application {
     private static Stage primaryStage;
+    public static int speed;
 
     @Override
     public void start(Stage primaryStage) throws Exception {
         this.primaryStage = primaryStage;
         this.primaryStage.setTitle("Gold Miner");
+        this.speed = 600;
         showInputMenu();
         //InputBox.display();
     }
@@ -38,10 +42,12 @@ public class Main extends Application {
     public static boolean isGameOver(GMObject o) {
         if (o instanceof Pit) {
             System.out.println("GAME OVER.");
+            InputsController.updateHistory("GAME OVER.");
             return true;
         }
         else if (o instanceof Gold) {
             System.out.println("YOU WIN!");
+            InputsController.updateHistory("YOU WIN!");
             return true;
         }
         return false;
@@ -62,24 +68,41 @@ public class Main extends Application {
                 // scans front
                 case 0:
                     System.out.println("SCAN " + m.getDirection());
+                    InputsController.updateHistory("SCAN " + m.getDirection());
                     m.scanFront(b);
                     break;
                 // rotates once
                 case 1:
                     System.out.println("ROTATE");
+                    InputsController.updateHistory("ROTATE");
                     m.rotateMiner();
                     break;
                 // moves miner
                 case 2:
                     System.out.println("MOVE " + m.getDirection());
+                    InputsController.updateHistory("MOVE " + m.getDirection());
                     o = m.moveMiner(b);
                     break;
                 default:
                     throw new IllegalStateException("Unexpected value: " + move);
             }
             if (o instanceof Beacon)
+            {
                 System.out.println("GOLD IS WITHIN " + ((Beacon) o).beaconScan(b) + " SQUARE/S.");
+                InputsController.updateHistory("GOLD IS WITHIN " + ((Beacon) o).beaconScan(b) + " SQUARE/S.");
+            }
+
             b.showBoard();
+            InputsController.updateMiner(m);
+            InputsController.updateMinerInfo(m);
+            // Delay part (5000 will be replaced with slider)
+            try {
+                Thread.sleep(speed);
+            }
+            catch (Exception e)
+            {
+                System.out.println(e);
+            }
         } while (!isGameOver(o));
     }
 
@@ -127,11 +150,12 @@ public class Main extends Application {
         // set the beacons
         board.initializeBeacons(bLoc);
         // show the board
-        board.showBoard();
 
         // random or intelligent AI
-        if (intel.equalsIgnoreCase("random"))
+        if (intel.equalsIgnoreCase("random")) {
+            InputsController.startGame(gridSize);
             random(m, board);
+        }
         else
             System.out.println("Intelligent");
 
@@ -151,6 +175,4 @@ public class Main extends Application {
 //        // should move 3 to the right and 1 down
 
     }
-
-
 }

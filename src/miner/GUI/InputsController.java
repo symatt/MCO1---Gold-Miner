@@ -7,8 +7,11 @@ import javafx.fxml.FXML;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ChoiceBox;
+import miner.Board;
+import miner.GameProperUI;
 import miner.Main;
-
+import javafx.application.Platform;
+import miner.Miner;
 
 
 public class InputsController {
@@ -50,5 +53,46 @@ public class InputsController {
     public void initialize() {
         randomSmartBox.setValue("Random");
         randomSmartBox.setItems(toggleChoicesList);
+    }
+
+    public static void startGame(int dimensions)
+    {
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                  GameProperUI.display(dimensions);
+            }
+        });
+    }
+
+    public static void updateMiner(Miner m)
+    {
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                  GameProperUI.updateMiner(m);
+            }
+        });
+    }
+
+    public static void updateMinerInfo(Miner m)
+    {
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                  GameProperUI.updateMinerInfo(m);
+            }
+        });
+    }
+
+    public static void updateHistory(String move)
+    {
+
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                GameProperUI.updateHistory(move);
+            }
+        });
     }
 }

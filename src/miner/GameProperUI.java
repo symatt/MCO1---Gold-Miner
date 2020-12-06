@@ -1,10 +1,7 @@
 package miner;
 
-import javafx.animation.KeyFrame;
-import javafx.animation.PauseTransition;
-import javafx.animation.Timeline;
 import javafx.beans.value.ChangeListener;
-import javafx.collections.ObservableList;
+import javafx.beans.value.ObservableValue;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
@@ -18,7 +15,7 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.scene.control.TextArea;
 import javafx.scene.layout.VBox;
-
+import javafx.scene.control.Slider;
 
 public final class GameProperUI {
 
@@ -26,19 +23,21 @@ public final class GameProperUI {
     static Text minerInfo = new Text();
     static VBox leftArea = new VBox();
     static GridPane mapGrid;
-    static GridPane mainFrame = new GridPane();
-    static StackPane historyStack;
-    static Rectangle historyBox;
-//    static Text history;
+    static GridPane mainFrame;
+//    static StackPane historyStack;
+    static  Slider slider;
     static TextArea history;
-    static int[][] row;
-    static int[][] column;
     static Scene stage;
-    static ImageView minerImage;
-    static Image minerIcon;
+    static ImageView minerImage = new ImageView();
+    static Image mIcon = new Image("/miner/Miner2.png");
+    static Miner m;
+    static Board b;
+    static final int columnSize = 778;
+    static final int rowSize = 768;
 
-    public static void display() {
+    public static void display(int dimensions) {
         // Creation of two columns
+        mainFrame = new GridPane();
         ColumnConstraints col1 = new ColumnConstraints(270);
         col1.setHalignment(HPos.CENTER);
         mainFrame.getColumnConstraints().add(col1);
@@ -48,11 +47,11 @@ public final class GameProperUI {
 //        mainFrame.setGridLinesVisible(true);
 
         // Building of Map and Miner
-        buildMap();
+        buildGrid(dimensions);
         buildMinerInfo();
+        stage = new Scene(mainFrame, 1024, 758, Color.GRAY);
         window = new Stage();
         window.setTitle("Gold Miner");
-        stage = new Scene(mainFrame, 1024, 758, Color.GRAY);
         window.setScene(stage);
         window.initStyle(StageStyle.DECORATED);
         window.setResizable(false);
@@ -63,13 +62,18 @@ public final class GameProperUI {
         minerInfo.setStyle("-fx-background-color: white;");
         minerInfo.setText("Rotations: 0\nScans: 0\nMoves: 0\n\n");
         minerInfo.setStyle("-fx-font: 30 Minecraft;");
-        // History Stack
-        historyStack = new StackPane();
-
-//        // History Box
-//        historyBox = new Rectangle(50, 50, 200, 200);
-//        historyBox.setFill(Color.ANTIQUEWHITE);
-
+        // Slider for Animation Speed
+        slider = new Slider(200 , 1000, 600);
+        slider.setMajorTickUnit(200);
+        slider.setShowTickMarks(true);
+        slider.setShowTickLabels(true);
+        slider.valueProperty().addListener(
+            new ChangeListener<Number>() {
+                public void changed(ObservableValue<? extends Number > observable, Number oldValue, Number newValue)
+                {
+                    Main.speed = (int) newValue;
+                }
+        });
         // Travel History
         history = new TextArea("Speedrun starts");
 //        history = new TextArea();
@@ -83,8 +87,8 @@ public final class GameProperUI {
         // History Area scrollbar
         history.setWrapText(true);
         leftArea.setSpacing(0);
-        historyStack.getChildren().addAll(history);
-        leftArea.getChildren().addAll(minerInfo, historyStack);
+//        historyStack.getChildren().addAll(history);
+        leftArea.getChildren().addAll(minerInfo, slider, history);
         mainFrame.add(leftArea, 0, 0);
         leftArea.setPadding(new Insets(30, 40, 60, 40));
     }
@@ -99,87 +103,93 @@ public final class GameProperUI {
 //        history.setText(history.getText + "action\n");
     }
 
-    public static void buildMap()
+    public static void buildGrid(int dimensions)
     {
         mapGrid = new GridPane();
         mapGrid.setGridLinesVisible(true);
 
-        int columnSize = 778;
-        int rowSize = 768;
         // Dimensions drawn from inputs
-        int rowCount = 14;
-        int columnCount = 14;
+        int rowCount = b.getGridSize();
+        int columnCount = b.getGridSize();
         //Situational
         for (int i = 0; i < rowCount; i++)
             mapGrid.getRowConstraints().add(new RowConstraints(rowSize / rowCount));
         for (int i = 0; i < columnCount; i++)
             mapGrid.getColumnConstraints().add(new ColumnConstraints(columnSize / columnCount));
 
-        // Miner Image
-        ImageView minerImage = new ImageView();
-        Image minerIcon = new Image("/sample/Miner2.png");
-        minerImage.setImage(minerIcon);
-        // Situational
-        minerImage.setFitHeight(rowSize / rowCount / 2);
-        minerImage.setFitWidth(columnSize / columnCount / 2);
-        GridPane.setHalignment(minerImage, HPos.LEFT);
-
-        // Beacons
-        for (int i = 0; i < 1; i++) {
-            ImageView bImage = new ImageView();
-            Image bIcon = new Image("/sample/Beacon.png");
-            bImage.setImage(bIcon);
-            bImage.setFitHeight(rowSize / rowCount / 2);
-            bImage.setFitWidth(rowSize / rowCount / 2);
-            GridPane.setHalignment(bImage, HPos.RIGHT);
-            GridPane.setConstraints(bImage, 0, 0);
-            mapGrid.getChildren().addAll(bImage);
-        }
-        // Gold
-        for (int i = 0; i < 1; i++) {
-            ImageView gImage = new ImageView();
-            Image gIcon = new Image("/sample/Gold.png");
-            gImage.setImage(gIcon);
-            gImage.setFitHeight(rowSize / rowCount / 2);
-            gImage.setFitWidth(rowSize / rowCount / 2);
-            GridPane.setHalignment(gImage, HPos.RIGHT);
-            GridPane.setConstraints(gImage, 2, 1);
-            mapGrid.getChildren().addAll(gImage);
-        }
-        // Pits
-        for (int i = 0; i < 1; i++) {
-            ImageView pImage = new ImageView();
-            Image pIcon = new Image("/sample/Lava.png");
-            pImage.setImage(pIcon);
-            pImage.setFitHeight(rowSize / rowCount / 2);
-            pImage.setFitWidth(rowSize / rowCount / 2);
-            GridPane.setHalignment(pImage, HPos.RIGHT);
-            GridPane.setConstraints(pImage, 3, 1);
-            mapGrid.getChildren().addAll(pImage);
-        }
         // Miner Image in grid
-        GridPane.setConstraints(minerImage, 0, 0);
+        minerImage.setImage(mIcon);
+        double size = rowSize / b.getGridSize() / 2;
+        minerImage.setFitHeight(size);
+        minerImage.setFitWidth(size);
+        mapGrid.setHalignment(minerImage, HPos.LEFT);
+        mapGrid.setConstraints(minerImage, 0, 0);
 
+        // Objects
+        for (int i = 0; i < b.getGridSize(); i++)
+            for (int j = 0; j < b.getGridSize(); j++)
+            {
+                if (b.getObjectAt(i, j) instanceof Pit)
+                {
+                    ImageView pImage = new ImageView();
+                    Image pIcon = new Image("/miner/Lava.png");
+                    pImage.setImage(pIcon);
+                    pImage.setFitHeight(size);
+                    pImage.setFitWidth(size);
+                    mapGrid.setHalignment(pImage, HPos.RIGHT);
+                    mapGrid.setConstraints(pImage, i, j);
+                    mapGrid.getChildren().addAll(pImage);
+                }
+                else if (b.getObjectAt(i, j) instanceof Gold)
+                {
+                    ImageView gImage = new ImageView();
+                    Image gIcon = new Image("/miner/Gold.png");
+                    gImage.setImage(gIcon);
+                    gImage.setFitHeight(size);
+                    gImage.setFitWidth(size);
+                    mapGrid.setHalignment(gImage, HPos.RIGHT);
+                    mapGrid.setConstraints(gImage, i, j);
+                    mapGrid.getChildren().addAll(gImage);
+                }
+                else if (b.getObjectAt(i, j) instanceof Beacon)
+                {
+                    ImageView bImage = new ImageView();
+                    Image bIcon = new Image("/miner/Beacon.png");
+                    bImage.setImage(bIcon);
+                    bImage.setFitHeight(size);
+                    bImage.setFitWidth(size);
+                    mapGrid.setHalignment(bImage, HPos.RIGHT);
+                    mapGrid.setConstraints(bImage, i, j);
+                    mapGrid.getChildren().addAll(bImage);
+                }
+            }
         mapGrid.getChildren().addAll(minerImage);
         mainFrame.add(mapGrid, 1, 0);
     }
 
-    public static void updateMap (int[] playerPos) {
-        int x = playerPos[0];
-        int y = playerPos[1];
-
+    public static void updateMiner (Miner m) {
         // Update position
-        GridPane.clearConstraints(minerImage);
-        GridPane.setConstraints(minerImage, x, y);
-        GridPane.setHalignment(minerImage, HPos.LEFT);
+        mapGrid.clearConstraints(minerImage);
+        mapGrid.setConstraints(minerImage, m.getXPos(), m.getYPos());
+        mapGrid.setHalignment(minerImage, HPos.LEFT);
         // Update Orientation
-//        if (Miner.direction == 1)
-//            minerImage.setRotate(0);
-//        else if (Miner.direction == 2)
-//            minerImage.setRotate(90);
-//        else if (Miner.direction == 3)
-//            minerImage.setRotate(180);
-//        else if (Miner.direction == 4
-//            minerImage.setRotate(270);
+        if (m.getDirection() == "DOWN")
+            minerImage.setRotate(0);
+        else if (m.getDirection() == "LEFT")
+            minerImage.setRotate(90);
+        else if (m.getDirection() == "UP")
+            minerImage.setRotate(180);
+        else if (m.getDirection() == "RIGHT")
+            minerImage.setRotate(270);
+    }
+
+    public static void updateMinerInfo (Miner m) {
+        // Update position
+        minerInfo.setText("Rotations: " + m.getNumOfRotates() + "\nScans: " + m.getNumOfScans() + "\nMoves: " + m.getNumOfMoves() + "\n\n");
+    }
+
+    public static void updateHistory (String move) {
+        // Update position
+        minerInfo.setText(minerInfo.getText() + "\n" + move);
     }
 }
