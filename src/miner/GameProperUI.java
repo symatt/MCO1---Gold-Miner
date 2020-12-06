@@ -49,6 +49,7 @@ public final class GameProperUI {
 
         // Building of Map and Miner
 
+        buildAllData();
         stage = new Scene(mainFrame, 1024, 758, Color.GRAY);
         return stage;
 //        window = new Stage();
