@@ -46,7 +46,7 @@ public class InputsController {
         goldLoc = goldField.getText();
         beaconLoc = beaconField.getText();
         config = (String) randomSmartBox.getValue();
-//        main.closeWindow();
+        main.closeWindow();
     }
 
     @FXML

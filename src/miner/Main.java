@@ -1,6 +1,7 @@
 package miner;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -397,7 +398,14 @@ public class Main extends Application {
         // random or intelligent AI
         if (intel.equalsIgnoreCase("random")){
 //            InputsController.startGame(board);
-            Main.primaryStage.setScene(GameProperUI.generateMainFrame(board));
+            Platform.runLater(new Runnable() {
+                @Override
+                public void run() {
+                    System.out.println("MAPSHOWYES");
+//                  GameProperUI.display(board);
+                }
+            });
+
             random(m, board);
 
         }
