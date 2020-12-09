@@ -12,10 +12,13 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
-import javafx.stage.StageStyle;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.TextArea;
 import javafx.scene.layout.VBox;
 import javafx.scene.control.Slider;
+import javafx.scene.control.Button;
+
+import static miner.GUI.InputsController.autoSkip;
 
 public final class GameProperUI {
 
@@ -33,16 +36,18 @@ public final class GameProperUI {
     static Miner m;
     static Board board;
     static final int columnSize = 778;
-    static final int rowSize = 768;
+    static final int rowSize = 760;
+    public static Button nextButton;
+    public static CheckBox autoMoveBox;
 
     public static Scene generateMainFrame(Board board) {
-        // Creation of two columns
+        // nextButton of two columns
         GameProperUI.board = board;
         mainFrame = new GridPane();
-        ColumnConstraints col1 = new ColumnConstraints(270);
+        ColumnConstraints col1 = new ColumnConstraints(240);
         col1.setHalignment(HPos.CENTER);
         mainFrame.getColumnConstraints().add(col1);
-        ColumnConstraints col2 = new ColumnConstraints(774);
+        ColumnConstraints col2 = new ColumnConstraints(804);
         col2.setHalignment(HPos.CENTER);
         mainFrame.getColumnConstraints().add(col2);
 //        mainFrame.setGridLinesVisible(true);
@@ -65,47 +70,45 @@ public final class GameProperUI {
 
     public static void buildMinerInfo() {
         minerInfo.setStyle("-fx-background-color: white;");
-        minerInfo.setText("Rotations: 0\nScans: 0\nMoves: 0\n\n");
+        minerInfo.setText("Rotations: 0\nScans: 0\nMoves: 0\nFacing: Right");
         minerInfo.setStyle("-fx-font: 30 Minecraft;");
-        // Slider for Animation Speed
-        slider = new Slider(200 , 1000, 600);
-        slider.setMajorTickUnit(200);
-        slider.setShowTickMarks(true);
-        slider.setShowTickLabels(true);
-        slider.valueProperty().addListener(
-            new ChangeListener<Number>() {
-                public void changed(ObservableValue<? extends Number > observable, Number oldValue, Number newValue)
-                {
-                    Main.speed = (int) newValue;
-                }
+        nextButton = new Button("Next move");
+        nextButton.setPrefWidth(200);
+        nextButton.setPrefHeight(100);
+        nextButton.setOnAction(value ->  {
+            Main.nextMove();
         });
+        autoMoveBox = new CheckBox("Auto Move");
+        autoMoveBox.setOnAction(value ->  {
+            autoSkip();
+        });
+
+
         // Travel History
         history = new TextArea("Speedrun starts");
-//        history = new TextArea();
-//        history = new Text("Speedrun starts!\n");
         history.setStyle("-fx-font: 13 Minecraft;");
-//        Font font = new Font("Minecraft", 20);
-//        history.setFont(font);
         history.setPrefHeight(600);
         history.setPrefWidth(50);
         history.setEditable(false);
+        history.textProperty().addListener(new ChangeListener<Object>() {
+            @Override
+            public void changed(ObservableValue<?> observable, Object oldValue,
+                                Object newValue) {
+                history.setScrollTop(Double.MAX_VALUE);
+            }
+        });
         // History Area scrollbar
         history.setWrapText(true);
-        leftArea.setSpacing(0);
-//        historyStack.getChildren().addAll(history);
-        leftArea.getChildren().addAll(minerInfo, slider, history);
+        leftArea.setSpacing(20);
+        leftArea.getChildren().addAll(minerInfo, nextButton, autoMoveBox, history); // , slider
+        leftArea.setPadding(new Insets(30, 40, 40, 30));
         mainFrame.add(leftArea, 0, 0);
-        leftArea.setPadding(new Insets(30, 40, 60, 40));
     }
 
     public static void updatePlayerView()
     {
         // Player statistics
-        minerInfo.setText("Rotations: 0\n\nScans: 0\n\nMoves: 0");
-        // playerInfo1.setText("Roatations: " + Game.Miner.getNumOfRotates() + "\n\nScans: " +
-        // Game.Miner.getNumOfScans() + "\n\nMoves: " + Game.Miner.getNumOfMoves());
-        // Player History
-//        history.setText(history.getText + "action\n");
+        minerInfo.setText("Rotations: " + m.getNumOfRotates() + "\nScans: " + m.getNumOfScans() + "\nMoves: " + m.getNumOfMoves() + "\nFacing: " + m.getDirection());
     }
 
     public static void buildGrid(Board b)
@@ -116,7 +119,7 @@ public final class GameProperUI {
         // Dimensions drawn from inputs
         int rowCount = b.getGridSize();
         int columnCount = b.getGridSize();
-        //Situational
+        // Column and Row sizes varies depending on grid size
         for (int i = 0; i < rowCount; i++)
             mapGrid.getRowConstraints().add(new RowConstraints(rowSize / rowCount));
         for (int i = 0; i < columnCount; i++)
@@ -179,22 +182,38 @@ public final class GameProperUI {
         mapGrid.setHalignment(minerImage, HPos.LEFT);
         // Update Orientation
         if (m.getDirection() == "DOWN")
-            minerImage.setRotate(0);
-        else if (m.getDirection() == "LEFT")
             minerImage.setRotate(90);
-        else if (m.getDirection() == "UP")
+        else if (m.getDirection() == "LEFT")
             minerImage.setRotate(180);
-        else if (m.getDirection() == "RIGHT")
+        else if (m.getDirection() == "UP")
             minerImage.setRotate(270);
+        else if (m.getDirection() == "RIGHT")
+            minerImage.setRotate(0);
     }
 
     public static void updateMinerInfo (Miner m) {
         // Update position
-        minerInfo.setText("Rotations: " + m.getNumOfRotates() + "\nScans: " + m.getNumOfScans() + "\nMoves: " + m.getNumOfMoves() + "\n\n");
+        if (m.getDirection() == "DOWN")
+            minerInfo.setText("Rotations: " + m.getNumOfRotates() + "\nScans: " + m.getNumOfScans() + "\nMoves: " + m.getNumOfMoves() + "\nFacing: " + m.getDirection());
+        else if (m.getDirection() == "LEFT")
+            minerInfo.setText("Rotations: " + m.getNumOfRotates() + "\nScans: " + m.getNumOfScans() + "\nMoves: " + m.getNumOfMoves() + "\nFacing: " + m.getDirection());
+        else if (m.getDirection() == "UP")
+            minerInfo.setText("Rotations: " + m.getNumOfRotates() + "\nScans: " + m.getNumOfScans() + "\nMoves: " + m.getNumOfMoves() + "\nFacing: " + m.getDirection());
+        else if (m.getDirection() == "RIGHT")
+            minerInfo.setText("Rotations: " + m.getNumOfRotates() + "\nScans: " + m.getNumOfScans() + "\nMoves: " + m.getNumOfMoves() + "\nFacing: " + m.getDirection());
     }
 
     public static void updateHistory (String move) {
         // Update position
-        minerInfo.setText(minerInfo.getText() + "\n" + move);
+//        history.setText(history.getText());
+        history.appendText("\n" + move);
+        history.textProperty().addListener(new ChangeListener<Object>() {
+            @Override
+            public void changed(ObservableValue<?> observable, Object oldValue,
+                                Object newValue) {
+                history.setScrollTop(Double.MAX_VALUE); //this will scroll to the bottom
+                //use Double.MIN_VALUE to scroll to the top
+            }
+        });
     }
 }

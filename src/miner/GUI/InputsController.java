@@ -1,5 +1,7 @@
 package miner.GUI;
 
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -9,6 +11,7 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ChoiceBox;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 import miner.Board;
 import miner.GameProperUI;
 import miner.Main;
@@ -16,6 +19,8 @@ import javafx.application.Platform;
 import miner.Miner;
 
 import java.util.ArrayList;
+
+import static miner.Main.nextMove;
 
 
 public class InputsController {
@@ -27,6 +32,7 @@ public class InputsController {
     public static String config;
 
     private static Main main;
+    public static Timeline timeline;
 
     ObservableList<String> toggleChoicesList = FXCollections.observableArrayList("Random", "Smart") ;
 
@@ -97,9 +103,29 @@ public class InputsController {
         stage.setScene(GameProperUI.generateMainFrame(gameBoard));
 
         // random or intelligent AI
-        if (intel.equalsIgnoreCase("random")) main.random(m, gameBoard);
-        else main.intelligent(m, gameBoard);
+        if (intel.equalsIgnoreCase("random")) {
+            m.setRational(1);
+            main.random(m, gameBoard);}
+        else {
+            m.setRational(2);
+            main.intelligent(m, gameBoard);
+        }
 //        main.closeWindow();
+    }
+
+    public static void autoSkip() {
+        if(GameProperUI.autoMoveBox.isSelected()) {
+            GameProperUI.nextButton.setDisable(true);
+            timeline = new Timeline(new KeyFrame(Duration.seconds(0.5), e -> nextMove()));
+            timeline.setCycleCount(Integer.MAX_VALUE);
+            timeline.play();
+        } else {
+            GameProperUI.nextButton.setDisable(false);
+            if(timeline != null) {
+                timeline.stop();
+                timeline = null;
+            }
+        }
     }
 
     @FXML

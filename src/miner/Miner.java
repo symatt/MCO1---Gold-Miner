@@ -14,6 +14,8 @@ public class Miner extends GMObject {
     private int numOfRotates;
     private int numOfScans;
     private ArrayList<ArrayList<Integer>> previousLocations;
+    private int rational;
+    // 1 - random, 2 - smart
 
     public Miner() {
         super(0, 0);
@@ -161,6 +163,9 @@ public class Miner extends GMObject {
         return previousLocations;
     }
 
+    public void setRational(int x){ this.rational = x; }
+
+    public int getRational(){ return this.rational; }
     @Override
     public String getName() { return "Miner";}
 }
