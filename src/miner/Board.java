@@ -36,7 +36,7 @@ public class Board {
 
     // initializes the pits input by the user
     public void initializePits(ArrayList<Integer> p) {
-        for (int i = 0; 2* i + 1 < p.size(); i++) {
+        for (int i = 0; 2 * i + 1 < p.size(); i++) {
             int pitX = p.get(2 * i) - 1, pitY = p.get(2 * i + 1) - 1;
             board.get(pitY).set(pitX, new Pit(pitX, pitY));
 //            InputsController.buildPits(this, pitY, pitX);

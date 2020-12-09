@@ -176,7 +176,7 @@ public class Main extends Application {
             }
             else {
                 // check first if the space has been visited so it is a low priority
-                if (m.didVisit(scObj.getXPos(), scObj.getYPos())) scObj.setVal(0);
+                if (m.didVisit(scObj.getXPos(), scObj.getYPos())) scObj.setVal(1);
                 scPlaces.add(scObj);
                 m.rotateMiner();
                 System.out.println("ROTATE");
@@ -360,7 +360,7 @@ public class Main extends Application {
             // the PQ is emptied out
             scPlaces.clear();
         }
-        b.showBoard();
+//        b.showBoard();
 
         if (foundGold) {
             GameProperUI.nextButton.setDisable(true);
